@@ -1,0 +1,20 @@
+{
+    "name": "libmpeg2",
+    "description": "MPEG-1/2 video decoder",
+    "filters":["mpeg2vdec","rfmpeg2v"],
+    "help": "This filter decodes raw MPEG-1/2 video elementary streams using libmpeg2.",
+    "support": [
+        "video"
+    ],
+    "sources":"https://bevara.ddns.net/sources/libmpeg2.accessor",
+    "filter_source":{
+        "mpeg2vdec" : "dec_mpeg2.c",
+        "rfmpeg2v" : "reframe_mpeg2v.c"
+    },
+    "extension":{
+      "m1v" : "canvas",
+      "m2v" : "canvas",
+      "mpv" : "canvas"
+    },
+    "licence_required":false
+}
