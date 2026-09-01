@@ -189,7 +189,7 @@ GF_FilterRegister ReframeMpeg2vRegister = {
 	.process = rfmpeg2v_process,
 	.process_event = rfmpeg2v_process_event};
 
-const GF_FilterRegister * EMSCRIPTEN_KEEPALIVE dynCall_mpeg2v_reframe_register(GF_FilterSession *session)
+const GF_FilterRegister * EMSCRIPTEN_KEEPALIVE mpeg2v_reframe_register(GF_FilterSession *session)
 {
 	return &ReframeMpeg2vRegister;
 }
@@ -197,5 +197,5 @@ const GF_FilterRegister * EMSCRIPTEN_KEEPALIVE dynCall_mpeg2v_reframe_register(G
 #include "filter_register.h"
 __attribute__((constructor))
 void register_mpeg2v_reframe(void) {
-    gf_filter_auto_register("mpeg2v_reframe", dynCall_mpeg2v_reframe_register);
+    gf_filter_auto_register("mpeg2v_reframe", mpeg2v_reframe_register);
 }

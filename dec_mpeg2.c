@@ -189,7 +189,7 @@ GF_FilterRegister Mpeg2DecoderRegister = {
 	.process = mpeg2vdec_process,
 };
 
-const GF_FilterRegister * EMSCRIPTEN_KEEPALIVE dynCall_mpeg2vdec_register(GF_FilterSession *session)
+const GF_FilterRegister * EMSCRIPTEN_KEEPALIVE mpeg2vdec_register(GF_FilterSession *session)
 {
 	return &Mpeg2DecoderRegister;
 }
@@ -197,5 +197,5 @@ const GF_FilterRegister * EMSCRIPTEN_KEEPALIVE dynCall_mpeg2vdec_register(GF_Fil
 #include "filter_register.h"
 __attribute__((constructor))
 void register_mpeg2vdec(void) {
-    gf_filter_auto_register("mpeg2vdec", dynCall_mpeg2vdec_register);
+    gf_filter_auto_register("mpeg2vdec", mpeg2vdec_register);
 }
