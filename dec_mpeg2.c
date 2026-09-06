@@ -84,6 +84,47 @@ static void mpeg2vdec_send_frame(GF_Mpeg2DecCtx *ctx, const mpeg2_fbuf_t *fbuf)
 	ctx->next_cts += ctx->frame_period ? ctx->frame_period : 450450;
 }
 
+/* Runs libmpeg2 over whatever is currently in its buffer, emitting each picture
+ * as it becomes displayable. Called twice per stream: once on the data, once on
+ * the synthetic sequence end code below. */
+static void mpeg2vdec_parse_loop(GF_Mpeg2DecCtx *ctx, mpeg2dec_t *decoder, const mpeg2_info_t *info)
+{
+	mpeg2_state_t state;
+
+	while (1)
+	{
+		state = mpeg2_parse(decoder);
+		if (state == STATE_BUFFER)
+			break;
+
+		switch (state)
+		{
+		case STATE_SEQUENCE:
+			ctx->width = info->sequence->width;
+			ctx->height = info->sequence->height;
+			ctx->chroma_width = info->sequence->chroma_width;
+			ctx->chroma_height = info->sequence->chroma_height;
+			ctx->frame_period = info->sequence->frame_period;
+
+			gf_filter_pid_set_property(ctx->opid, GF_PROP_PID_WIDTH, &PROP_UINT(ctx->width));
+			gf_filter_pid_set_property(ctx->opid, GF_PROP_PID_HEIGHT, &PROP_UINT(ctx->height));
+			gf_filter_pid_set_property(ctx->opid, GF_PROP_PID_STRIDE, &PROP_UINT(ctx->width));
+			ctx->seq_ready = GF_TRUE;
+			break;
+		case STATE_SLICE:
+		case STATE_END:
+		case STATE_INVALID_END:
+			if (ctx->seq_ready && info->display_fbuf)
+			{
+				mpeg2vdec_send_frame(ctx, info->display_fbuf);
+			}
+			break;
+		default:
+			break;
+		}
+	}
+}
+
 static GF_Err mpeg2vdec_process(GF_Filter *filter)
 {
 	GF_FilterPacket *pck;
@@ -91,7 +132,6 @@ static GF_Err mpeg2vdec_process(GF_Filter *filter)
 	u32 size;
 	mpeg2dec_t *decoder;
 	const mpeg2_info_t *info;
-	mpeg2_state_t state;
 	GF_Mpeg2DecCtx *ctx = (GF_Mpeg2DecCtx *)gf_filter_get_udta(filter);
 
 	pck = gf_filter_pid_get_packet(ctx->ipid);
@@ -126,37 +166,18 @@ static GF_Err mpeg2vdec_process(GF_Filter *filter)
 	ctx->next_cts = 0;
 	ctx->seq_ready = GF_FALSE;
 
-	while (1)
+	mpeg2vdec_parse_loop(ctx, decoder, info);
+
+	/* A picture only becomes displayable once libmpeg2 has seen what follows
+	 * it, so at the end of the data the last pictures are still held back.
+	 * Most encoders close the stream with a sequence end code and libmpeg2
+	 * flushes on that; ffmpeg's raw MPEG-2 output does not, and the tail of
+	 * the sequence would simply be missing. Feeding one here costs nothing on
+	 * a stream that already had it - the decoder just sees a second end. */
 	{
-		state = mpeg2_parse(decoder);
-		if (state == STATE_BUFFER)
-			break;
-
-		switch (state)
-		{
-		case STATE_SEQUENCE:
-			ctx->width = info->sequence->width;
-			ctx->height = info->sequence->height;
-			ctx->chroma_width = info->sequence->chroma_width;
-			ctx->chroma_height = info->sequence->chroma_height;
-			ctx->frame_period = info->sequence->frame_period;
-
-			gf_filter_pid_set_property(ctx->opid, GF_PROP_PID_WIDTH, &PROP_UINT(ctx->width));
-			gf_filter_pid_set_property(ctx->opid, GF_PROP_PID_HEIGHT, &PROP_UINT(ctx->height));
-			gf_filter_pid_set_property(ctx->opid, GF_PROP_PID_STRIDE, &PROP_UINT(ctx->width));
-			ctx->seq_ready = GF_TRUE;
-			break;
-		case STATE_SLICE:
-		case STATE_END:
-		case STATE_INVALID_END:
-			if (ctx->seq_ready && info->display_fbuf)
-			{
-				mpeg2vdec_send_frame(ctx, info->display_fbuf);
-			}
-			break;
-		default:
-			break;
-		}
+		static u8 seq_end_code[4] = {0x00, 0x00, 0x01, 0xB7};
+		mpeg2_buffer(decoder, seq_end_code, seq_end_code + 4);
+		mpeg2vdec_parse_loop(ctx, decoder, info);
 	}
 
 	mpeg2_close(decoder);
