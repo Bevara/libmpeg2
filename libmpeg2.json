@@ -16,5 +16,6 @@
       "m2v" : "canvas",
       "mpv" : "canvas"
     },
-    "licence_required":false
+    "licence_required":false,
+    "using": ["solver_minimal_1", "solver_1"]
 }
