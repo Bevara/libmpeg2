@@ -16,6 +16,10 @@
       "m2v" : "canvas",
       "mpv" : "canvas"
     },
-    "licence_required":false,
-    "using": ["solver_minimal_1", "solver_1"]
+    "using": ["solver_minimal_1", "solver_1"],
+    "patents": {
+        "status": "expired",
+        "note": "MPEG-1 and MPEG-2 video",
+        "checked": "2026-10-16"
+    }
 }
