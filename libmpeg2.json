@@ -1,5 +1,6 @@
 {
     "name": "libmpeg2",
+    "version": "1.0.1",
     "description": "MPEG-1/2 video decoder",
     "filters":["mpeg2vdec","rfmpeg2v"],
     "help": "This filter decodes raw MPEG-1/2 video elementary streams using libmpeg2.",
