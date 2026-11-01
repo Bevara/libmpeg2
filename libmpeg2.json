@@ -1,6 +1,6 @@
 {
     "name": "libmpeg2",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "MPEG-1/2 video decoder",
     "filters":["mpeg2vdec","rfmpeg2v"],
     "help": "This filter decodes raw MPEG-1/2 video elementary streams using libmpeg2.",
@@ -17,7 +17,7 @@
       "m2v" : "canvas",
       "mpv" : "canvas"
     },
-    "using": ["solver_minimal_1", "solver_1"],
+    "using": ["mm_solver_minimal_1.0.1", "mm_solver_1.0.1"],
     "patents": {
         "status": "expired",
         "note": "MPEG-1 and MPEG-2 video",
