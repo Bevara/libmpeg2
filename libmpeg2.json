@@ -2,22 +2,32 @@
     "name": "libmpeg2",
     "version": "1.0.2",
     "description": "MPEG-1/2 video decoder",
-    "filters":["mpeg2vdec","rfmpeg2v"],
+    "filters": [
+        "mpeg2vdec",
+        "rfmpeg2v"
+    ],
     "help": "This filter decodes raw MPEG-1/2 video elementary streams using libmpeg2.",
     "support": [
         "video"
     ],
-    "sources":"https://bevara.ddns.net/sources/libmpeg2.accessor",
-    "filter_source":{
-        "mpeg2vdec" : "dec_mpeg2.c",
-        "rfmpeg2v" : "reframe_mpeg2v.c"
+    "sources": "https://bevara.ddns.net/sources/libmpeg2.accessor",
+    "filter_source": {
+        "mpeg2vdec": "dec_mpeg2.c",
+        "rfmpeg2v": "reframe_mpeg2v.c"
     },
-    "extension":{
-      "m1v" : "canvas",
-      "m2v" : "canvas",
-      "mpv" : "canvas"
+    "extension": {
+        "m1v": "canvas",
+        "m2v": "canvas",
+        "mpv": "canvas"
     },
-    "using": ["mm_solver_minimal_1.0.1", "mm_solver_1.0.1", "mm_solver_1.0.2", "mm_solver_1.0.3", "mm_solver_1.0.4"],
+    "using": [
+        "mm_solver_minimal_1.0.1",
+        "mm_solver_1.0.1",
+        "mm_solver_1.0.2",
+        "mm_solver_1.0.3",
+        "mm_solver_1.0.4",
+        "mm_solver_1.0.5"
+    ],
     "patents": {
         "status": "expired",
         "note": "MPEG-1 and MPEG-2 video",
